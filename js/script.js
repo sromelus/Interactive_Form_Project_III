@@ -3,6 +3,9 @@ const $shirtColor = $('#color').hide();
 const $noColorOption  = $('#no-color')
 const $priceTag = $('#price')
 const $checkboxes = $('.activities input');
+const $creditCard = $('#credit-card');
+const $paypal = $('#paypal').hide();
+const $bitcoin = $('#bitcoin').hide();
 
 
 $('#name').focus();
@@ -10,7 +13,7 @@ $('#name').focus();
 // $('.activities input')
 // console.log( $(e.target).data('cost'))
 
-$('.activities').on("change", (e)=> {
+$('.activities').on('change', (e)=> {
   let balance = 0.00;
   const $checkbox = $(e.target);
   const $selectedCheckboxes = $('.activities input:checked');
@@ -34,31 +37,44 @@ $('.activities').on("change", (e)=> {
   for(let i = 0; i < $selectedCheckboxes.length; i++ ){
     balance += $($selectedCheckboxes[i]).data('cost');
   }
-
   $priceTag.text(`$${balance.toFixed(2)}`)
-
 });
 
 
-$('#design').on("change", (e) => {
+$('#design').on('change', (e) => {
+  $(e.target[0]).attr('disabled', true);
   $shirtColor.show();
   $noColorOption.hide();
   const $colorOptions = $('#color option').hide();
-  if(e.target.value === "js puns"){
+  if(e.target.value === 'js puns'){
     $colorOptions.slice( 0, 3 ).show();
-  } else if(e.target.value === "heart js"){
+  } else if(e.target.value === 'heart js'){
     $colorOptions.slice( 3, 6 ).show();
-  } else {
-    $shirtColor.hide();
-    $noColorOption.show();
   }
 });
 
 
-$('#title').on("change", (e) => {
-  if(e.target.value === "other"){
+$('#title').on('change', (e) => {
+  if(e.target.value === 'other'){
     $otherTitle.show();
   } else {
     $otherTitle.hide()
+  }
+});
+
+$('#payment').on('change',(e) => {
+  $(e.target[0]).attr('disabled', true);
+  if(e.target.value === 'paypal'){
+    $paypal.show();
+    $bitcoin.hide()
+    $creditCard.hide();
+  } else if(e.target.value === 'bitcoin') {
+    $bitcoin.show();
+    $paypal.hide();
+    $creditCard.hide();
+  } else {
+    $creditCard.show();
+    $bitcoin.hide()
+    $paypal.hide();
   }
 });
