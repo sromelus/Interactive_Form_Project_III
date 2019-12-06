@@ -180,6 +180,22 @@ option {
   clear: both;
 }
 
+.invalid {
+  border-color: #f53;
+}
+
+.invalid-text{
+  color: #f53;
+}
+
+.valid {
+  border-color: #0f3;
+}
+
+.valid-text {
+  color: #0f3;
+}
+
 /* =================================
   Media Queries
 ==================================== */
