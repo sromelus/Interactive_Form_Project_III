@@ -1,6 +1,5 @@
 const $otherTitle = $('#other-title').hide();
 const $shirtColor = $('#color').hide();
-const $noColorOption  = $('#no-color')
 const $priceTag = $('#price')
 const $checkboxes = $('.activities input');
 const $creditCard = $('#credit-card');
@@ -18,6 +17,9 @@ const incompleteSubmissionText = '<div id="form-incomplete"  style="display: non
 const completeSubmissionText = '<div id="form-complete"  style="display: none" class="valid-text">Congrats!! From submitted successfully</div>';
 const selectAtLeastOneText = '<div id="invalid-activity"  style="display: none" class="invalid-text">Please select at least one activity.</div>';
 let $selectedCheckboxes = $('.activities input:checked');
+
+
+$shirtColor.prev().hide();
 
 $name.prev().append(' <span id="invalid-name" style="display: none" class="invalid-text">invalid</span>');
 $name.prev().append(' <span id="invalid-name" style="display: none" class="invalid-text">invalid</span>');
@@ -93,7 +95,7 @@ $activities.on('change', (e)=> {
 $design.on('change', (e) => {
   $(e.target[0]).attr('disabled', true);
   $shirtColor.show();
-  $noColorOption.hide();
+  $shirtColor.prev().show();
   const $colorOptions = $('#color option').hide();
   if(e.target.value === 'js puns'){
     $colorOptions.slice( 0, 3 ).show();
@@ -208,8 +210,8 @@ $submit.on('click', (e) => {
       $('#cvv').prev().addClass("invalid-text");
     }
   } else {
-      $('#form-complete').show();
-      $('#form-incomplete').hide();
+    $('#invalid-activity').hide();
+    $('#form-complete').show();
+    $('#form-incomplete').hide();
   }
-
 })
