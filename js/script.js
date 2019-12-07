@@ -198,32 +198,14 @@ $submit.on('click', (e) => {
       $('#invalid-activity').hide();
     }
 
-    if(isNameValid){
-      $name.addClass('invalid');
-      $('#invalid-name').show();
-    }
+    $name.trigger('focusout');
+    $mail.trigger('focusout');
+    $creditCardNumber.trigger('focusout');
+    $zipcode.trigger('focusout');
+    $cvv.trigger('focusout');
 
-    if(isMailValid){
-      $mail.addClass('invalid');
-      $('#invalid-mail').show();
-    }
-
-    if(isCardNumberValid){
-      $creditCardNumber.addClass("invalid");
-      $creditCardNumber.prev().addClass("invalid-text");
-    }
-
-    if(isZipValid){
-      $zipcode.addClass("invalid");
-      $zipcode.prev().addClass("invalid-text");
-    }
-
-    if(isCvvValid){
-      $cvv.addClass("invalid");
-      $cvv.prev().addClass("invalid-text");
-    }
   } else {
-    // if user input valid show valid messages
+    // if user input valid show successful message 
     $('#invalid-activity').hide();
     $('#form-complete').show();
     $('#form-incomplete').hide();
