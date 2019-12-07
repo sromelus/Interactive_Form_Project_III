@@ -24,9 +24,11 @@ const incompleteSubmissionText = '<div id="form-incomplete"  style="display: non
 const completeSubmissionText = '<div id="form-complete"  style="display: none" class="valid-text">Congrats!! From submitted successfully</div>';
 const selectAtLeastOneText = '<div id="invalid-activity"  style="display: none" class="invalid-text">Please select at least one activity.</div>';
 const $zipcode = $('#zip');
+// I used let to declare the bottom variable to allow me to manipulate their values later in the code.
 let $selectedCheckboxes = $('.activities input:checked');
 let isValidCard;
 
+// validInput function checks if user input is valid by showing a valid notification
 const validInput = (element) => {
   element.addClass('valid');
   element.removeClass('invalid');
@@ -34,6 +36,7 @@ const validInput = (element) => {
   element.prev().children().eq(1).show();
 }
 
+// invalidInput function checks if user input is invalid by showing an invalid notification
 const invalidInput = (element) => {
   element.addClass('invalid');
   element.removeClass('valid');
@@ -41,12 +44,14 @@ const invalidInput = (element) => {
   element.prev().children().eq(1).hide();
 }
 
+// togglePaymentsMethod function shows current selected payment method and hides all other payment options
 const togglePaymentsMethod = (element) => {
   element.show();
   $(element.siblings()[3]).hide()
   $(element.siblings()[4]).hide();
 }
 
+// validateCard function changes label and input box border color to red if user's input is not the right format
 const validateCard = (element) => {
   if(!isValidCard){
     element.addClass("invalid");
@@ -57,6 +62,7 @@ const validateCard = (element) => {
   }
 }
 
+//as the page load the messges below are appended to the DOM
 $shirtColor.prev().hide();
 
 $name.prev().append(' <span id="invalid-name" style="display: none" class="invalid-text">invalid</span>');
@@ -87,17 +93,23 @@ $mail.on('focusout', (e) => {
 })
 
 $activities.on('change', (e)=> {
+  // declaring balance with let here allows me to use it in both for loops bellow
   let balance = 0.00;
   const $checkbox = $(e.target);
   $selectedCheckboxes = $('.activities input:checked');
-  //Loop over the `checkboxes` variable above to iterate over all the checkbox inputs
-  //if the checkbox is not checked and the data-day-and-time attribute is the same as
-  // the checked checkbox, disabled current checkbox.
+
+  //if selected checkbox is not the main Conference
+  //iterate over the '$checkboxes'
+  //assign the checked checkbox to a variable called '$checked'
+  //assign the checked checkbox type to a variable called '$checkedCheckboxType'
+  //assign the current checkbox type in the loop to a variable called '$currentCheckboxType'
+  //if checked checkbox type is equal to the current checkbox type in the loop. disabled the current checkbox
+
   if($checkbox.prop('name') !== 'all'){
     for(let i = 1; i < $checkboxes.length; i++){
       const $checked = $($checkboxes[i]).prop('checked');
       const $checkedCheckboxType = $checkbox.data('day-and-time')
-      const $currentCheckboxType = $($checkboxes[i]).data('dayAndTime');
+      const $currentCheckboxType = $($checkboxes[i]).data('day-and-time');
 
       if(!$checkbox.prop('checked') && $currentCheckboxType === $checkedCheckboxType){
         $($checkboxes[i]).attr('disabled', false)
@@ -107,6 +119,7 @@ $activities.on('change', (e)=> {
     }
   }
 
+// loop over all checked checkbox, sum the cost and assign the total cost to variable call 'balance'
   for(let i = 0; i < $selectedCheckboxes.length; i++ ){
     balance += $($selectedCheckboxes[i]).data('cost');
   }
@@ -164,13 +177,17 @@ $cvv.on('focusout', (e) => {
 
 $submit.on('click', (e) => {
   e.preventDefault();
+  // on submit we check if all inputs are valid.
+  // if they are valid user will receive a successful notification
+  // if they are not valid user will receive a notification to check highlighted input
   const atLeastOne = ($selectedCheckboxes.length === 0);
   const isNameValid = ($name.attr('class') !== 'valid');
   const isMailValid = ($mail.attr('class') !== 'valid');
-  const isCardNumberValid = ($('#cc-num').attr('class') === 'invalid');
-  const isZipValid = ($('#zip').attr('class') === 'invalid');
-  const isCvvValid = ($('#cvv').attr('class') === 'invalid');
+  const isCardNumberValid = ($creditCardNumber.val() === '' || $creditCardNumber.attr('class') === 'invalid');
+  const isZipValid = ($zipcode.val() === '' || $zipcode.attr('class') === 'invalid');
+  const isCvvValid = ($cvv.val() === '' || $cvv.attr('class') === 'invalid');
 
+// if user input invalid show invalid notification for sections that are incomplete
   if(atLeastOne || isNameValid || isMailValid || isCardNumberValid || isZipValid || isCvvValid){
     $('#form-incomplete').show();
     $('#form-complete').hide();
@@ -191,21 +208,22 @@ $submit.on('click', (e) => {
       $('#invalid-mail').show();
     }
 
-    if($('#cc-num').val() === '' || isCardNumberValid){
-      $('#cc-num').addClass("invalid");
-      $('#cc-num').prev().addClass("invalid-text");
+    if(isCardNumberValid){
+      $creditCardNumber.addClass("invalid");
+      $creditCardNumber.prev().addClass("invalid-text");
     }
 
-    if($('#zip').val() === '' || isZipValid){
-      $('#zip').addClass("invalid");
-      $('#zip').prev().addClass("invalid-text");
+    if(isZipValid){
+      $zipcode.addClass("invalid");
+      $zipcode.prev().addClass("invalid-text");
     }
 
-    if($('#cvv').val() === '' || isCvvValid){
-      $('#cvv').addClass("invalid");
-      $('#cvv').prev().addClass("invalid-text");
+    if(isCvvValid){
+      $cvv.addClass("invalid");
+      $cvv.prev().addClass("invalid-text");
     }
   } else {
+    // if user input valid show valid messages
     $('#invalid-activity').hide();
     $('#form-complete').show();
     $('#form-incomplete').hide();
