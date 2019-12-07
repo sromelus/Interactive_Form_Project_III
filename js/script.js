@@ -1,27 +1,64 @@
-const $otherTitle = $('#other-title').hide();
-const $shirtColor = $('#color').hide();
-const $priceTag = $('#price')
+/******************************************
+Treehouse Techdegree:
+FSJS project 3 - Interactive Form
+******************************************/
+
+const $activities = $('.activities');
+const $bitcoin = $('#bitcoin').hide();
 const $checkboxes = $('.activities input');
 const $creditCard = $('#credit-card');
-const $paypal = $('#paypal').hide();
-const $bitcoin = $('#bitcoin').hide();
-const $name = $('#name').focus();
-const $mail = $('#mail');
-const $submit = $('button');
-const $activities = $('.activities');
-const $payment = $('#payment');
-const $title = $('#title');
+const $creditCardNumber = $('#cc-num');
+const $cvv = $('#cvv');
 const $design = $('#design');
+const $otherTitle = $('#other-title').hide();
 const $legend = $('legend').eq(2);
+const $mail = $('#mail');
+const $name = $('#name').focus();
+const $payment = $('#payment');
+const $paypal = $('#paypal').hide();
+const $priceTag = $('#price')
+const $shirtColor = $('#color').hide();
+const $submit = $('button');
+const $title = $('#title');
 const incompleteSubmissionText = '<div id="form-incomplete"  style="display: none" class="invalid-text">Please complete all requirements before registering.</div>';
 const completeSubmissionText = '<div id="form-complete"  style="display: none" class="valid-text">Congrats!! From submitted successfully</div>';
 const selectAtLeastOneText = '<div id="invalid-activity"  style="display: none" class="invalid-text">Please select at least one activity.</div>';
+const $zipcode = $('#zip');
 let $selectedCheckboxes = $('.activities input:checked');
+let isValidCard;
 
+const validInput = (element) => {
+  element.addClass('valid');
+  element.removeClass('invalid');
+  element.prev().children().eq(0).hide();
+  element.prev().children().eq(1).show();
+}
+
+const invalidInput = (element) => {
+  element.addClass('invalid');
+  element.removeClass('valid');
+  element.prev().children().eq(0).show();;
+  element.prev().children().eq(1).hide();
+}
+
+const togglePaymentsMethod = (element) => {
+  element.show();
+  $(element.siblings()[3]).hide()
+  $(element.siblings()[4]).hide();
+}
+
+const validateCard = (element) => {
+  if(!isValidCard){
+    element.addClass("invalid");
+    element.prev().addClass("invalid-text");
+  } else {
+    element.removeClass("invalid");
+    element.prev().removeClass("invalid-text");
+  }
+}
 
 $shirtColor.prev().hide();
 
-$name.prev().append(' <span id="invalid-name" style="display: none" class="invalid-text">invalid</span>');
 $name.prev().append(' <span id="invalid-name" style="display: none" class="invalid-text">invalid</span>');
 $name.prev().append(' <span id="valid-name"  style="display: none" class="valid-text">OK!</span>')
 $mail.prev().append(' <span id="invalid-mail"  style="display: none" class="invalid-text">invalid</span>');
@@ -30,39 +67,24 @@ $submit.before(incompleteSubmissionText);
 $submit.before(completeSubmissionText);
 $legend.before(selectAtLeastOneText);
 
+
 $name.on('focusout', (e) => {
-  inValidName = /^[A-Za-z]+\s?([A-Za-z]+)?$/.test(e.target.value);
+  const inValidName = /^[A-Za-z]+\s?([A-Za-z]+)?$/.test(e.target.value);
   if(inValidName){
-    $name.addClass('valid');
-    $name.removeClass('invalid');
-    $('#invalid-name').hide();
-    $('#valid-name').show();
+    validInput($name);
   } else {
-    $name.addClass('invalid');
-    $name.removeClass('valid');
-    $('#invalid-name').show();
-    $('#valid-name').hide();
+    invalidInput($name);
   }
 })
 
 $mail.on('focusout', (e) => {
-  const inValidEmail = /\w+@[a-z]+\.[a-z]+/.test(e.target.value)
+  const inValidEmail = /^\w+@[a-z]+\.[a-z]+$/.test(e.target.value)
   if(inValidEmail){
-    $mail.addClass('valid');
-    $mail.removeClass('invalid');
-    $('#invalid-mail').hide();
-    $('#valid-mail').show();
+    validInput($mail);
   } else {
-    $mail.addClass('invalid');
-    $mail.removeClass('valid');
-    $('#invalid-mail').show();
-    $('#valid-mail').hide();
+    invalidInput($mail);
   }
 })
-
-
-// $('.activities input')
-// console.log( $(e.target).data('cost'))
 
 $activities.on('change', (e)=> {
   let balance = 0.00;
@@ -116,54 +138,28 @@ $title.on('change', (e) => {
 $payment.on('change',(e) => {
   $(e.target[0]).attr('disabled', true);
   if(e.target.value === 'paypal'){
-    $paypal.show();
-    $bitcoin.hide()
-    $creditCard.hide();
+    togglePaymentsMethod($paypal)
   } else if(e.target.value === 'bitcoin') {
-    $bitcoin.show();
-    $paypal.hide();
-    $creditCard.hide();
+    togglePaymentsMethod($bitcoin)
   } else {
-    $creditCard.show();
-    $bitcoin.hide()
-    $paypal.hide();
+    togglePaymentsMethod($creditCard)
   }
 });
 
-$('#cc-num').on('focusout', (e) => {
-  const isValidCard = /^\d{13,16}$/.test(e.target.value);
-  if(!isValidCard){
-    $('#cc-num').addClass("invalid");
-    $('#cc-num').prev().addClass("invalid-text");
-  } else {
-    $('#cc-num').removeClass("invalid");
-    $('#cc-num').prev().removeClass("invalid-text");
-  }
+$creditCardNumber.on('focusout', (e) => {
+  isValidCard = /^\d{13,16}$/.test(e.target.value);
+  validateCard($creditCardNumber);
 })
 
-$('#zip').on('focusout', (e) => {
-  const isValidCard = /^\d{5}$/.test(e.target.value);
-  if(!isValidCard){
-    $('#zip').addClass("invalid");
-    $('#zip').prev().addClass("invalid-text");
-  } else {
-    $('#zip').removeClass("invalid");
-    $('#zip').prev().removeClass("invalid-text");
-  }
+$zipcode.on('focusout', (e) => {
+  isValidCard = /^\d{5}$/.test(e.target.value);
+  validateCard($zipcode);
 })
 
-$('#cvv').on('focusout', (e) => {
-  const isValidCard = /^\d{3}$/.test(e.target.value);
-  if(!isValidCard){
-    $('#cvv').addClass("invalid");
-    $('#cvv').prev().addClass("invalid-text");
-  } else {
-    $('#cvv').removeClass("invalid");
-    $('#cvv').prev().removeClass("invalid-text");
-  }
+$cvv.on('focusout', (e) => {
+  isValidCard = /^\d{3}$/.test(e.target.value);
+  validateCard($cvv);
 })
-
-
 
 
 $submit.on('click', (e) => {
