@@ -4,9 +4,9 @@ FSJS project 3 - Interactive Form
 ******************************************/
 
 const $activities = $('.activities');
-const $bitcoin = $('#bitcoin').hide();
+const $bitcoinPaymentInstruction = $('#bitcoin').hide();
 const $checkboxes = $('.activities input');
-const $creditCard = $('#credit-card');
+const $creditCardInstruction = $('#credit-card');
 const $creditCardNumber = $('#cc-num');
 const $cvv = $('#cvv');
 const $design = $('#design');
@@ -15,14 +15,20 @@ const $legend = $('legend').eq(2);
 const $mail = $('#mail');
 const $name = $('#name').focus();
 const $payment = $('#payment');
-const $paypal = $('#paypal').hide();
+const $paymentType = $('#payment option');
+const $paypalPaymentInstruction = $('#paypal').hide();
 const $priceTag = $('#price')
 const $shirtColor = $('#color').hide();
 const $submit = $('button');
 const $title = $('#title');
 const incompleteSubmissionText = '<div id="form-incomplete"  style="display: none" class="invalid-text">Please complete all requirements before registering.</div>';
-const completeSubmissionText = '<div id="form-complete"  style="display: none" class="valid-text">Congrats!! From submitted successfully</div>';
-const selectAtLeastOneText = '<div id="invalid-activity"  style="display: none" class="invalid-text">Please select at least one activity.</div>';
+const activitySectionInvalidText = '<div id="invalid-activity"  style="display: none" class="invalid-text">Please select at least one activity.</div>';
+// let invalidCardMessages = '<ul><li id="invalid-cvv-text" class="invalid-text" style="display: none"> cvv should be a 3-digit number behind your card.</li>';
+// invalidCardMessages += '<li id="invalid-zipcode-text" class="invalid-text" style="display: none"> zidcode should be a 5-digit number.</li>';
+// invalidCardMessages += '<li id="invalid-card-text" class="invalid-text" style="display: none"> credit card number should be between 13 and 16 digits.</li></ul>';
+const invalidCvvMessage = '<li id="invalid-cvv-text" class="invalid-text" style="display: none"> cvv should be a 3-digit number behind your card.</li>';
+const invalidZipcodeMessage = '<li id="invalid-zipcode-text" class="invalid-text" style="display: none"> zidcode should be a 5-digit number.</li>';
+const invalidCardMessage = '<li id="invalid-card-text" class="invalid-text" style="display: none"> credit card number should be between 13 and 16 digits.</li>';
 const $zipcode = $('#zip');
 // I used let to declare the bottom variable to allow me to manipulate their values later in the code.
 let $selectedCheckboxes = $('.activities input:checked');
@@ -44,34 +50,46 @@ const invalidInput = (element) => {
   element.prev().children().eq(1).hide();
 }
 
-// togglePaymentsMethod function shows current selected payment method and hides all other payment options
-const togglePaymentsMethod = (element) => {
+// changePaymentsMethod function shows current selected payment method and hides all other payment options
+// loops through $paymentType to toggle on and off selected elements base on the event target
+const changePaymentsMethod = (element) => {
   element.show();
+  // $paymentType.eq(1).attr('selected', true);
   $(element.siblings()[3]).hide()
   $(element.siblings()[4]).hide();
+  for(let i = 1; i < $paymentType.length; i++){
+
+    if($($paymentType[i]).val() === element.prop('class').replace('-', ' ')){
+       $($paymentType[i]).attr('selected', true)
+    } else {
+      $($paymentType[i]).attr('selected', false)
+    }
+  }
 }
 
 // validateCard function changes label and input box border color to red if user's input is not the right format
 const validateCard = (element) => {
-  if(!isValidCard){
-    element.addClass("invalid");
-    element.prev().addClass("invalid-text");
-  } else {
+  if(isValidCard){
     element.removeClass("invalid");
     element.prev().removeClass("invalid-text");
+  } else {
+    element.addClass("invalid");
+    element.prev().addClass("invalid-text");
   }
 }
 
 //as the page load the messges below are appended to the DOM
 $shirtColor.prev().hide();
-
-$name.prev().append(' <span id="invalid-name" style="display: none" class="invalid-text">invalid</span>');
-$name.prev().append(' <span id="valid-name"  style="display: none" class="valid-text">OK!</span>')
-$mail.prev().append(' <span id="invalid-mail"  style="display: none" class="invalid-text">invalid</span>');
-$mail.prev().append(' <span id="valid-mail"  style="display: none" class="valid-text">OK!</span>');
+$paymentType.eq(1).attr('selected', true);
+$name.prev().append('<span id="invalid-name" style="display: none" class="invalid-text"> Please enter a valid name only letter characters.</span>');
+$name.prev().append('<span id="valid-name"  style="display: none" class="valid-text"> OK!</span>')
+$mail.prev().append('<span id="invalid-mail"  style="display: none" class="invalid-text"> Please enter a valid email format.</span>');
+$mail.prev().append('<span id="valid-mail"  style="display: none" class="valid-text"> OK!</span>');
+$payment.after(invalidCvvMessage);
+$payment.after(invalidZipcodeMessage);
+$payment.after(invalidCardMessage);
 $submit.before(incompleteSubmissionText);
-$submit.before(completeSubmissionText);
-$legend.before(selectAtLeastOneText);
+$legend.before(activitySectionInvalidText);
 
 
 $name.on('focusout', (e) => {
@@ -133,8 +151,12 @@ $design.on('change', (e) => {
   $shirtColor.prev().show();
   const $colorOptions = $('#color option').hide();
   if(e.target.value === 'js puns'){
+    $colorOptions.eq(1).attr('selected', true)
+    $colorOptions.eq(3).attr('selected', false)
     $colorOptions.slice( 0, 3 ).show();
   } else if(e.target.value === 'heart js'){
+    $colorOptions.eq(3).attr('selected', true)
+    $(e.target).attr('selected', true);
     $colorOptions.slice( 3, 6 ).show();
   }
 });
@@ -151,63 +173,80 @@ $title.on('change', (e) => {
 $payment.on('change',(e) => {
   $(e.target[0]).attr('disabled', true);
   if(e.target.value === 'paypal'){
-    togglePaymentsMethod($paypal)
+    changePaymentsMethod($paypalPaymentInstruction)
   } else if(e.target.value === 'bitcoin') {
-    togglePaymentsMethod($bitcoin)
+    changePaymentsMethod($bitcoinPaymentInstruction)
   } else {
-    togglePaymentsMethod($creditCard)
+    changePaymentsMethod($creditCardInstruction)
   }
 });
 
 $creditCardNumber.on('focusout', (e) => {
   isValidCard = /^\d{13,16}$/.test(e.target.value);
   validateCard($creditCardNumber);
+  if($creditCardNumber.attr('class') === 'invalid'){
+    $('#invalid-card-text').show();
+  } else {
+    $('#invalid-card-text').hide();
+  }
 })
 
 $zipcode.on('focusout', (e) => {
   isValidCard = /^\d{5}$/.test(e.target.value);
   validateCard($zipcode);
+  if($zipcode.attr('class') === 'invalid'){
+    $('#invalid-zipcode-text').show();
+  } else {
+    $('#invalid-zipcode-text').hide();
+  }
 })
 
 $cvv.on('focusout', (e) => {
   isValidCard = /^\d{3}$/.test(e.target.value);
   validateCard($cvv);
+  if($cvv.attr('class') === 'invalid'){
+    $('#invalid-cvv-text').show();
+  } else {
+    $('#invalid-cvv-text').hide();
+  }
 })
 
-
 $submit.on('click', (e) => {
-  e.preventDefault();
   // on submit we check if all inputs are valid.
   // if they are valid user will receive a successful notification
   // if they are not valid user will receive a notification to check highlighted input
-  const atLeastOne = ($selectedCheckboxes.length === 0);
-  const isNameValid = ($name.attr('class') !== 'valid');
-  const isMailValid = ($mail.attr('class') !== 'valid');
-  const isCardNumberValid = ($creditCardNumber.val() === '' || $creditCardNumber.attr('class') === 'invalid');
-  const isZipValid = ($zipcode.val() === '' || $zipcode.attr('class') === 'invalid');
-  const isCvvValid = ($cvv.val() === '' || $cvv.attr('class') === 'invalid');
+  const atLeastOneActivityNotChecked = ($selectedCheckboxes.length === 0);
+  const nameInvalid = ($name.attr('class') !== 'valid');
+  const mailInvalid = ($mail.attr('class') !== 'valid');
+  const cardNumberInvalid = ($creditCardNumber.val() === '' || $creditCardNumber.attr('class') === 'invalid');
+  const zipInvalid = ($zipcode.val() === '' || $zipcode.attr('class') === 'invalid');
+  const cvvInvalid = ($cvv.val() === '' || $cvv.attr('class') === 'invalid');
+  const isCreditCardSelected = ($paymentType.eq(1).attr('selected') === 'selected');
+  const isAtLeastOneIsInvalid = (cardNumberInvalid || zipInvalid || cvvInvalid)
+  const cardSelected = (isCreditCardSelected && isAtLeastOneIsInvalid)
 
-// if user input invalid show invalid notification for sections that are incomplete
-  if(atLeastOne || isNameValid || isMailValid || isCardNumberValid || isZipValid || isCvvValid){
-    $('#form-incomplete').show();
-    $('#form-complete').hide();
+  if(nameInvalid || mailInvalid || atLeastOneActivityNotChecked || cardSelected){
+    e.preventDefault();
+    $name.trigger('focusout');
+    $mail.trigger('focusout');
 
-    if(atLeastOne){
+    if(atLeastOneActivityNotChecked){
       $('#invalid-activity').show();
     } else {
       $('#invalid-activity').hide();
     }
 
-    $name.trigger('focusout');
-    $mail.trigger('focusout');
-    $creditCardNumber.trigger('focusout');
-    $zipcode.trigger('focusout');
-    $cvv.trigger('focusout');
-
+    if(isCreditCardSelected){
+      if(cardNumberInvalid || zipInvalid || cvvInvalid){
+        $creditCardNumber.trigger('focusout');
+        $zipcode.trigger('focusout');
+        $cvv.trigger('focusout');
+      }
+    }
+    $('#form-incomplete').show();
   } else {
-    // if user input valid show successful message 
-    $('#invalid-activity').hide();
-    $('#form-complete').show();
-    $('#form-incomplete').hide();
+    //submit form to the server
   }
+
+
 })
