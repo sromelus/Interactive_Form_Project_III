@@ -23,9 +23,6 @@ const $submit = $('button');
 const $title = $('#title');
 const incompleteSubmissionText = '<div id="form-incomplete"  style="display: none" class="invalid-text">Please complete all requirements before registering.</div>';
 const activitySectionInvalidText = '<div id="invalid-activity"  style="display: none" class="invalid-text">Please select at least one activity.</div>';
-// let invalidCardMessages = '<ul><li id="invalid-cvv-text" class="invalid-text" style="display: none"> cvv should be a 3-digit number behind your card.</li>';
-// invalidCardMessages += '<li id="invalid-zipcode-text" class="invalid-text" style="display: none"> zidcode should be a 5-digit number.</li>';
-// invalidCardMessages += '<li id="invalid-card-text" class="invalid-text" style="display: none"> credit card number should be between 13 and 16 digits.</li></ul>';
 const invalidCvvMessage = '<li id="invalid-cvv-text" class="invalid-text" style="display: none"> cvv should be a 3-digit number behind your card.</li>';
 const invalidZipcodeMessage = '<li id="invalid-zipcode-text" class="invalid-text" style="display: none"> zidcode should be a 5-digit number.</li>';
 const invalidCardMessage = '<li id="invalid-card-text" class="invalid-text" style="display: none"> credit card number should be between 13 and 16 digits.</li>';
@@ -146,10 +143,10 @@ $activities.on('change', (e)=> {
 
 
 $design.on('change', (e) => {
-  $(e.target[0]).attr('disabled', true);
-  $shirtColor.show();
-  $shirtColor.prev().show();
-  const $colorOptions = $('#color option').hide();
+  $(e.target[0]).attr('disabled', true);//disable select payment method
+  $shirtColor.prev().show();// show shirt color label
+  $shirtColor.show(); // show shirt color options
+  const $colorOptions = $('#color option').hide(); //hide shirt color options
   if(e.target.value === 'js puns'){
     $colorOptions.eq(1).attr('selected', true)
     $colorOptions.eq(3).attr('selected', false)
@@ -161,7 +158,7 @@ $design.on('change', (e) => {
   }
 });
 
-
+// if other is selected for job role show show other input box
 $title.on('change', (e) => {
   if(e.target.value === 'other'){
     $otherTitle.show();
