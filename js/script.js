@@ -21,9 +21,9 @@ const $priceTag = $('#price')
 const $shirtColor = $('#color').hide();
 const $submit = $('button');
 const $title = $('#title');
-const incompleteSubmissionText = '<div id="form-incomplete"  style="display: none" class="invalid-text">Please complete all requirements before registering.</div>';
+const incompleteSubmissionText = '<div id="form-incomplete"  style="display: none" class="invalid-text">Please complete all requirements above.</div>';
 const activitySectionInvalidText = '<div id="invalid-activity"  style="display: none" class="invalid-text">Please select at least one activity.</div>';
-const invalidCvvMessage = '<li id="invalid-cvv-text" class="invalid-text" style="display: none"> cvv should be a 3-digit number behind your card.</li>';
+const invalidCvvMessage = '<li id="invalid-cvv-text" class="invalid-text" style="display: none"> cvv should be a 3-digit number.</li>';
 const invalidZipcodeMessage = '<li id="invalid-zipcode-text" class="invalid-text" style="display: none"> zidcode should be a 5-digit number.</li>';
 const invalidCardMessage = '<li id="invalid-card-text" class="invalid-text" style="display: none"> credit card number should be between 13 and 16 digits.</li>';
 const $zipcode = $('#zip');
@@ -35,25 +35,24 @@ let isValidCard;
 const validInput = (element) => {
   element.addClass('valid');
   element.removeClass('invalid');
-  element.prev().children().eq(0).hide();
-  element.prev().children().eq(1).show();
+  element.prev().children().eq(0).slideUp();
+  element.prev().children().eq(1).fadeIn(500);
 }
 
 // invalidInput function checks if user input is invalid by showing an invalid notification
 const invalidInput = (element) => {
   element.addClass('invalid');
   element.removeClass('valid');
-  element.prev().children().eq(0).show();;
-  element.prev().children().eq(1).hide();
+  element.prev().children().eq(0).fadeIn(500);;
+  element.prev().children().eq(1).slideUp();
 }
 
 // changePaymentsMethod function shows current selected payment method and hides all other payment options
 // loops through $paymentType to toggle on and off selected elements base on the event target
 const changePaymentsMethod = (element) => {
-  element.show();
-  // $paymentType.eq(1).attr('selected', true);
-  $(element.siblings()[3]).hide()
-  $(element.siblings()[4]).hide();
+  element.fadeIn(500);
+  $(element.siblings()[6]).slideUp();
+  $(element.siblings()[7]).slideUp();
   for(let i = 1; i < $paymentType.length; i++){
 
     if($($paymentType[i]).val() === element.prop('class').replace('-', ' ')){
@@ -75,8 +74,25 @@ const validateCard = (element) => {
   }
 }
 
+// this function hides all credit card error messages when payment is change to paypal or bitcoin
+const hideCardErrorMessages = () => {
+  $('#invalid-card-text').slideUp();
+  $('#invalid-zipcode-text').slideUp();
+  $('#invalid-cvv-text').slideUp();
+  $creditCardNumber.removeClass("invalid");
+  $creditCardNumber.prev().removeClass("invalid-text");
+  $zipcode.removeClass("invalid");
+  $zipcode.prev().removeClass("invalid-text");
+  $cvv.removeClass("invalid");
+  $cvv.prev().removeClass("invalid-text");
+  const checkIfAllSectionAreValid = (($name.attr('class') === 'valid') && ($mail.attr('class') === 'valid') && ($name.attr('class') === 'valid')) && ($selectedCheckboxes.length > 0);
+  if(checkIfAllSectionAreValid){
+    $('#form-incomplete').fadeOut(500);
+  }
+}
+
 //as the page load the messges below are appended to the DOM
-$shirtColor.prev().hide();
+$shirtColor.prev().slideUp();
 $paymentType.eq(1).attr('selected', true);
 $name.prev().append('<span id="invalid-name" style="display: none" class="invalid-text"> Please enter a valid name only letter characters.</span>');
 $name.prev().append('<span id="valid-name"  style="display: none" class="valid-text"> OK!</span>')
@@ -135,35 +151,40 @@ $activities.on('change', (e)=> {
   }
 
 // loop over all checked checkbox, sum the cost and assign the total cost to variable call 'balance'
-  for(let i = 0; i < $selectedCheckboxes.length; i++ ){
-    balance += $($selectedCheckboxes[i]).data('cost');
+  if($selectedCheckboxes.length > 0){
+    for(let i = 0; i < $selectedCheckboxes.length; i++ ){
+      balance += $($selectedCheckboxes[i]).data('cost');
+    }
+    $('#invalid-activity').slideUp();
+    $priceTag.text(`$${balance.toFixed(2)}`)
+  } else {
+    $('#invalid-activity').fadeIn(500);
   }
-  $priceTag.text(`$${balance.toFixed(2)}`)
 });
 
 
 $design.on('change', (e) => {
   $(e.target[0]).attr('disabled', true);//disable select payment method
-  $shirtColor.prev().show();// show shirt color label
-  $shirtColor.show(); // show shirt color options
-  const $colorOptions = $('#color option').hide(); //hide shirt color options
+  $shirtColor.prev().fadeIn(500);// show shirt color label
+  $shirtColor.fadeIn(500); // show shirt color options
+  const $colorOptions = $('#color option').slideUp(); //hide shirt color options
   if(e.target.value === 'js puns'){
     $colorOptions.eq(1).attr('selected', true)
     $colorOptions.eq(3).attr('selected', false)
-    $colorOptions.slice( 0, 3 ).show();
+    $colorOptions.slice( 0, 3 ).fadeIn(500);
   } else if(e.target.value === 'heart js'){
     $colorOptions.eq(3).attr('selected', true)
     $(e.target).attr('selected', true);
-    $colorOptions.slice( 3, 6 ).show();
+    $colorOptions.slice( 3, 6 ).fadeIn(500);
   }
 });
 
 // if other is selected for job role show show other input box
 $title.on('change', (e) => {
   if(e.target.value === 'other'){
-    $otherTitle.show();
+    $otherTitle.fadeIn(500);
   } else {
-    $otherTitle.hide()
+    $otherTitle.slideUp();
   }
 });
 
@@ -171,8 +192,10 @@ $payment.on('change',(e) => {
   $(e.target[0]).attr('disabled', true);
   if(e.target.value === 'paypal'){
     changePaymentsMethod($paypalPaymentInstruction)
+    hideCardErrorMessages();
   } else if(e.target.value === 'bitcoin') {
     changePaymentsMethod($bitcoinPaymentInstruction)
+    hideCardErrorMessages();
   } else {
     changePaymentsMethod($creditCardInstruction)
   }
@@ -182,9 +205,9 @@ $creditCardNumber.on('focusout', (e) => {
   isValidCard = /^\d{13,16}$/.test(e.target.value);
   validateCard($creditCardNumber);
   if($creditCardNumber.attr('class') === 'invalid'){
-    $('#invalid-card-text').show();
+    $('#invalid-card-text').fadeIn(500);
   } else {
-    $('#invalid-card-text').hide();
+    $('#invalid-card-text').slideUp();
   }
 })
 
@@ -192,9 +215,9 @@ $zipcode.on('focusout', (e) => {
   isValidCard = /^\d{5}$/.test(e.target.value);
   validateCard($zipcode);
   if($zipcode.attr('class') === 'invalid'){
-    $('#invalid-zipcode-text').show();
+    $('#invalid-zipcode-text').fadeIn(500);
   } else {
-    $('#invalid-zipcode-text').hide();
+    $('#invalid-zipcode-text').slideUp();
   }
 })
 
@@ -202,9 +225,9 @@ $cvv.on('focusout', (e) => {
   isValidCard = /^\d{3}$/.test(e.target.value);
   validateCard($cvv);
   if($cvv.attr('class') === 'invalid'){
-    $('#invalid-cvv-text').show();
+    $('#invalid-cvv-text').fadeIn(500);
   } else {
-    $('#invalid-cvv-text').hide();
+    $('#invalid-cvv-text').slideUp();
   }
 })
 
@@ -228,9 +251,9 @@ $submit.on('click', (e) => {
     $mail.trigger('focusout');
 
     if(atLeastOneActivityNotChecked){
-      $('#invalid-activity').show();
+      $('#invalid-activity').fadeIn(500);
     } else {
-      $('#invalid-activity').hide();
+      $('#invalid-activity').slideUp();
     }
 
     if(isCreditCardSelected){
@@ -240,10 +263,8 @@ $submit.on('click', (e) => {
         $cvv.trigger('focusout');
       }
     }
-    $('#form-incomplete').show();
+    $('#form-incomplete').fadeIn(500);
   } else {
     //submit form to the server
   }
-
-
 })
