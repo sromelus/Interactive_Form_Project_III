@@ -26,6 +26,9 @@ const activitySectionInvalidText = '<div id="invalid-activity"  style="display: 
 const invalidCvvMessage = '<li id="invalid-cvv-text" class="invalid-text" style="display: none"> cvv should be a 3-digit number.</li>';
 const invalidZipcodeMessage = '<li id="invalid-zipcode-text" class="invalid-text" style="display: none"> zidcode should be a 5-digit number.</li>';
 const invalidCardMessage = '<li id="invalid-card-text" class="invalid-text" style="display: none"> Please enter a number that is between 13 and 16 digits long.</li>';
+const invalidEmptyCardNumber = '<li id="invalid-card-number-empty-text" class="invalid-text" style="display: none"> Please enter a credit card number.</li>';
+const invalidEmptyZipNumber = '<li id="invalid-zip-number-empty-text" class="invalid-text" style="display: none"> Please enter a zipcode.</li>';
+const invalidEmptyCvvNumber = '<li id="invalid-cvv-number-empty-text" class="invalid-text" style="display: none"> Please enter a 3-digit pin code (cvv).</li>';
 const $zipcode = $('#zip');
 // I used let to declare the bottom variable to allow me to manipulate their values later in the code.
 let $selectedCheckboxes = $('.activities input:checked');
@@ -51,8 +54,10 @@ const invalidInput = (element) => {
 // loops through $paymentType to toggle on and off selected elements base on the event target
 const changePaymentsMethod = (element) => {
   element.fadeIn(500);
-  $(element.siblings()[6]).slideUp();
-  $(element.siblings()[7]).slideUp();
+  const lastSibling = (element.siblings().length - 1);
+  const secondToLastSibling = (lastSibling - 1);
+  $(element.siblings()[secondToLastSibling]).slideUp();
+  $(element.siblings()[lastSibling]).slideUp();
   for(let i = 1; i < $paymentType.length; i++){
 
     if($($paymentType[i]).val() === element.prop('class').replace('-', ' ')){
@@ -79,6 +84,9 @@ const hideCardErrorMessages = () => {
   $('#invalid-card-text').slideUp();
   $('#invalid-zipcode-text').slideUp();
   $('#invalid-cvv-text').slideUp();
+  $('#invalid-card-number-empty-text').slideUp();
+  $('#invalid-zip-number-empty-text').slideUp();
+  $('#invalid-cvv-number-empty-text').slideUp();
   $creditCardNumber.removeClass("invalid");
   $creditCardNumber.prev().removeClass("invalid-text");
   $zipcode.removeClass("invalid");
@@ -101,11 +109,14 @@ $mail.prev().append('<span id="valid-mail"  style="display: none" class="valid-t
 $payment.after(invalidCvvMessage);
 $payment.after(invalidZipcodeMessage);
 $payment.after(invalidCardMessage);
+$payment.after(invalidEmptyCvvNumber);
+$payment.after(invalidEmptyZipNumber);
+$payment.after(invalidEmptyCardNumber);
 $submit.before(incompleteSubmissionText);
 $legend.before(activitySectionInvalidText);
 
 
-$name.on('focusout', (e) => {
+$name.on('focusout input', (e) => {
   const inValidName = /^[A-Za-z]+\s?([A-Za-z]+)?$/.test(e.target.value);
   if(inValidName){
     validInput($name);
@@ -114,7 +125,7 @@ $name.on('focusout', (e) => {
   }
 })
 
-$mail.on('focusout', (e) => {
+$mail.on('focusout input', (e) => {
   const inValidEmail = /^\w+@[a-z]+\.[a-z]+$/.test(e.target.value)
   if(inValidEmail){
     validInput($mail);
@@ -201,30 +212,56 @@ $payment.on('change',(e) => {
   }
 });
 
-$creditCardNumber.on('focusout', (e) => {
+$creditCardNumber.on('focusout input', (e) => {
   isValidCard = /^\d{13,16}$/.test(e.target.value);
-  validateCard($creditCardNumber);
-  if($creditCardNumber.attr('class') === 'invalid'){
+  if($creditCardNumber.val() === ''){
+    $('#invalid-card-number-empty-text').fadeIn(500);
+  }else{
+    $('#invalid-card-number-empty-text').slideUp();
+    validateCard($creditCardNumber);
+  }
+
+  if($creditCardNumber.attr('class') === 'invalid' && $creditCardNumber.val() === ''){
+    $('#invalid-card-text').slideUp();
+  } else if ($creditCardNumber.attr('class') === 'invalid' && $creditCardNumber.val().length === 10 ) {
+    $('#invalid-card-text').fadeIn(500);
+  } else if ($creditCardNumber.attr('class') === 'invalid' && $creditCardNumber.val().length > 16 ) {
     $('#invalid-card-text').fadeIn(500);
   } else {
     $('#invalid-card-text').slideUp();
   }
 })
 
-$zipcode.on('focusout', (e) => {
+$zipcode.on('focusout input', (e) => {
   isValidCard = /^\d{5}$/.test(e.target.value);
-  validateCard($zipcode);
-  if($zipcode.attr('class') === 'invalid'){
+  if($zipcode.val() === ''){
+    $('#invalid-zip-number-empty-text').fadeIn(500);
+  }else{
+    $('#invalid-zip-number-empty-text').slideUp();
+    validateCard($zipcode);
+  }
+
+  if($zipcode.attr('class') === 'invalid' && $zipcode.val() === ''){
+    $('#invalid-zipcode-text').slideUp();
+  } else if ($zipcode.attr('class') === 'invalid' && $zipcode.val().length > 0){
     $('#invalid-zipcode-text').fadeIn(500);
   } else {
     $('#invalid-zipcode-text').slideUp();
   }
 })
 
-$cvv.on('focusout', (e) => {
+$cvv.on('focusout input', (e) => {
   isValidCard = /^\d{3}$/.test(e.target.value);
-  validateCard($cvv);
-  if($cvv.attr('class') === 'invalid'){
+  if($cvv.val() === ''){
+    $('#invalid-cvv-number-empty-text').fadeIn(500);
+  }else{
+    $('#invalid-cvv-number-empty-text').slideUp();
+    validateCard($cvv);
+  }
+
+  if($cvv.attr('class') === 'invalid' && $cvv.val() === ''){
+    $('#invalid-cvv-text').slideUp();
+  } else if ($cvv.attr('class') === 'invalid' && $cvv.val().length > 0) {
     $('#invalid-cvv-text').fadeIn(500);
   } else {
     $('#invalid-cvv-text').slideUp();
@@ -238,7 +275,7 @@ $submit.on('click', (e) => {
   const atLeastOneActivityNotChecked = ($selectedCheckboxes.length === 0);
   const nameInvalid = ($name.attr('class') !== 'valid');
   const mailInvalid = ($mail.attr('class') !== 'valid');
-  const cardNumberInvalid = ($creditCardNumber.val() === '' || $creditCardNumber.attr('class') === 'invalid');
+  const cardNumberInvalid = ($creditCardNumber.val() === ''|| $creditCardNumber.attr('class') === 'invalid');
   const zipInvalid = ($zipcode.val() === '' || $zipcode.attr('class') === 'invalid');
   const cvvInvalid = ($cvv.val() === '' || $cvv.attr('class') === 'invalid');
   const isCreditCardSelected = ($paymentType.eq(1).attr('selected') === 'selected');
