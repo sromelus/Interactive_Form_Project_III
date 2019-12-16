@@ -24,11 +24,11 @@ const $title = $('#title');
 const incompleteSubmissionText = '<div id="form-incomplete"  style="display: none" class="invalid-text">Please complete all requirements above.</div>';
 const activitySectionInvalidText = '<div id="invalid-activity"  style="display: none" class="invalid-text">Please select at least one activity.</div>';
 const invalidCvvMessage = '<li id="invalid-cvv-text" class="invalid-text" style="display: none"> cvv should be a 3-digit number.</li>';
-const invalidZipcodeMessage = '<li id="invalid-zipcode-text" class="invalid-text" style="display: none"> zidcode should be a 5-digit number.</li>';
+const invalidZipcodeMessage = '<li id="invalid-zipcode-text" class="invalid-text" style="display: none"> zipcode should be a 5-digit number.</li>';
 const invalidCardMessage = '<li id="invalid-card-text" class="invalid-text" style="display: none"> Please enter a number that is between 13 and 16 digits long.</li>';
 const invalidEmptyCardNumber = '<li id="invalid-card-number-empty-text" class="invalid-text" style="display: none"> Please enter a credit card number.</li>';
 const invalidEmptyZipNumber = '<li id="invalid-zip-number-empty-text" class="invalid-text" style="display: none"> Please enter a zipcode.</li>';
-const invalidEmptyCvvNumber = '<li id="invalid-cvv-number-empty-text" class="invalid-text" style="display: none"> Please enter a 3-digit pin code (cvv).</li>';
+const invalidEmptyCvvNumber = '<li id="invalid-cvv-number-empty-text" class="invalid-text" style="display: none"> Please enter the security code.</li>';
 const $zipcode = $('#zip');
 // I used let to declare the bottom variable to allow me to manipulate their values later in the code.
 let $selectedCheckboxes = $('.activities input:checked');
