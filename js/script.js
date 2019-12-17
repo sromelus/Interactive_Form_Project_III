@@ -223,7 +223,7 @@ $creditCardNumber.on('focusout input', (e) => {
 
   if($creditCardNumber.attr('class') === 'invalid' && $creditCardNumber.val() === ''){
     $('#invalid-card-text').slideUp();
-  } else if ($creditCardNumber.attr('class') === 'invalid' && $creditCardNumber.val().length === 10 ) {
+  } else if ($creditCardNumber.attr('class') === 'invalid' && ($creditCardNumber.val().length > 9) && ($creditCardNumber.val().length < 13)) {
     $('#invalid-card-text').fadeIn(500);
   } else if ($creditCardNumber.attr('class') === 'invalid' && $creditCardNumber.val().length > 16 ) {
     $('#invalid-card-text').fadeIn(500);
